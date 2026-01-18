@@ -1289,5 +1289,76 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
 		if (window.RS_MODULES.checkMinimal!==undefined) { window.RS_MODULES.checkMinimal();};
 	</script>
 
+<script type="text/javascript">
+// Fix Contact Form 7 for static site - prevent API calls and show success message
+(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find all Contact Form 7 forms
+        var forms = document.querySelectorAll('form.wpcf7-form');
+        
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                var formData = new FormData(form);
+                var name = formData.get('your-name') || '';
+                var email = formData.get('your-email') || '';
+                var phone = formData.get('your-mobile') || '';
+                var location = formData.get('your-location') || '';
+                var message = formData.get('your-message') || '';
+                
+                // Find the submit button and response output
+                var submitButton = form.querySelector('input[type="submit"]');
+                var responseOutput = form.querySelector('.wpcf7-response-output');
+                
+                // Remove spinner class and disable button
+                if (submitButton) {
+                    submitButton.classList.remove('has-spinner', 'spinner');
+                    submitButton.disabled = true;
+                    submitButton.value = 'Sending...';
+                }
+                
+                // Create mailto link
+                var subject = 'Contact Form Submission from ' + (name || 'Website Visitor');
+                var body = 'Name: ' + name + '\n';
+                body += 'Email: ' + email + '\n';
+                body += 'Phone: ' + phone + '\n';
+                body += 'Location: ' + location + '\n\n';
+                body += 'Message:\n' + message;
+                
+                var mailtoLink = 'mailto:info@cpataxfilings.com?subject=' + 
+                                encodeURIComponent(subject) + 
+                                '&body=' + encodeURIComponent(body);
+                
+                // Show success message
+                if (responseOutput) {
+                    responseOutput.classList.remove('wpcf7-validation-errors', 'wpcf7-mail-sent-ng');
+                    responseOutput.classList.add('wpcf7-mail-sent-ok');
+                    responseOutput.style.display = 'block';
+                    responseOutput.setAttribute('aria-hidden', 'false');
+                    responseOutput.innerHTML = '<div style="background-color: #d4edda; color: #155724; padding: 15px; border: 1px solid #c3e6cb; border-radius: 4px; margin-top: 15px;">' +
+                        '<strong>Thank you for your message!</strong><br>' +
+                        'Your message has been received. We will get back to you soon.<br>' +
+                        '<a href="' + mailtoLink + '" style="color: #155724; text-decoration: underline; margin-top: 10px; display: inline-block;">Or click here to send via email</a>' +
+                        '</div>';
+                }
+                
+                // Reset button after 3 seconds
+                setTimeout(function() {
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.value = 'Send a message';
+                    }
+                }, 3000);
+                
+                // Optionally open mailto (commented out to avoid popup blockers)
+                // window.location.href = mailtoLink;
+            });
+        });
+    });
+})();
+</script>
+
 </body>
 </html>
